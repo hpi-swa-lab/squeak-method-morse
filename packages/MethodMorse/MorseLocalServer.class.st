@@ -93,7 +93,7 @@ MorseLocalServer >> remoteMorser: aMethodMorser [
 
 {
 	#category : #accessing,
-	#'squeak_changestamp' : 'ct 2/1/2026 01:14'
+	#'squeak_changestamp' : 'ct 2/14/2026 22:35'
 }
 MorseLocalServer >> remoteProjectsFor: projects [
 
@@ -102,8 +102,9 @@ MorseLocalServer >> remoteProjectsFor: projects [
 	mappedSpaces := self remoteSpacesFor: groupedProjects keys.
 	mappedProjects := Dictionary new.
 	mappedSpaces with: groupedProjects values do: [:remoteSpace :group |
-		mappedProjects atAll: group putAll: (remoteSpace projectsWithAllNames: (group collect: #name))].
-	^ mappedProjects atAll: projects
+		mappedProjects morseAtAll: group putAll:
+			(remoteSpace projectsWithAllNames: (group collect: #name))].
+	^ mappedProjects morseAtAll: projects
 ]
 
 {
@@ -135,13 +136,13 @@ MorseLocalServer >> remoteSpaces: aDictionary [
 
 {
 	#category : #accessing,
-	#'squeak_changestamp' : 'ct 2/1/2026 01:58'
+	#'squeak_changestamp' : 'ct 2/14/2026 22:35'
 }
 MorseLocalServer >> remoteSpacesFor: spaces [
 
 	self isRunning ifFalse: [self error: 'server not running'].
 	self remoteServer isRunning ifFalse: [self error: 'remote server not running'].
-	^ self remoteSpaces atAll: spaces
+	^ self remoteSpaces morseAtAll: spaces
 ]
 
 {
