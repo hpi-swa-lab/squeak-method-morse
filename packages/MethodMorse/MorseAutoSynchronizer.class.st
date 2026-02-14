@@ -121,10 +121,14 @@ MorseAutoSynchronizer >> projects [
 
 {
 	#category : #private,
-	#'squeak_changestamp' : 'ct 2/12/2026 01:58'
+	#'squeak_changestamp' : 'ct 2/14/2026 23:55'
 }
-MorseAutoSynchronizer >> resetFailedKeys [
+MorseAutoSynchronizer >> reset [
 
+	"pendingChanges removeAll."
+	self flag: #workaround. "queue is not cleaned up properly after stopping: https://github.com/squeak-smalltalk/squeak-object-memory/issues/144"
+	pendingChanges := SharedQueue2 new.
+	
 	failedKeys removeAll.
 	self changed: #wasIncomplete.
 ]
@@ -143,12 +147,12 @@ MorseAutoSynchronizer >> run [
 
 {
 	#category : #control,
-	#'squeak_changestamp' : 'ct 2/12/2026 01:58'
+	#'squeak_changestamp' : 'ct 2/14/2026 23:02'
 }
 MorseAutoSynchronizer >> start [
 
 	self stop.
-	self resetFailedKeys.
+	self reset.
 	
 	process := [[self run] ifCurtailed: [self stop]]
 		forkAt: Processor systemBackgroundPriority.
