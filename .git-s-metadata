@@ -1,0 +1,36 @@
+GSMetadata {
+	#version : 1,
+	#mappers : OrderedCollection [
+		GSTonelMapper {
+			#version : 1,
+			#package : MCPackage {
+				#name : 'BaselineOfMethodMorse'
+			},
+			#path : FSAbsolutePath [
+				'packages'
+			]
+		},
+		GSTonelMapper {
+			#version : 1,
+			#package : MCPackage {
+				#name : 'MethodMorse'
+			},
+			#path : @5
+		},
+		GSTonelMapper {
+			#version : 1,
+			#package : MCPackage {
+				#name : 'MethodMorseDomains-Code'
+			},
+			#path : @5
+		},
+		GSTonelMapper {
+			#version : 1,
+			#package : MCPackage {
+				#name : 'MethodMorseDomains-Demo'
+			},
+			#path : @5
+		}
+	],
+	#name : 'squeak-method-morse'
+}
