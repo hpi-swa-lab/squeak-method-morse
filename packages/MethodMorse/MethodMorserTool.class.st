@@ -291,7 +291,7 @@ MethodMorserTool >> autoSyncPaneHeightWith: builder [
 
 {
 	#category : #'accessing - toolbuilder',
-	#'squeak_changestamp' : 'ct 2/14/2026 19:08'
+	#'squeak_changestamp' : 'ct 2/16/2026 00:03'
 }
 MethodMorserTool >> basicAutoSyncIncomingHelp [
 	<uses: #(lastIncomingAutoSyncStamp hasIncompleteAutoSyncIncoming incomingAutoSyncRecency)>
@@ -305,12 +305,12 @@ MethodMorserTool >> basicAutoSyncIncomingHelp [
 				{stamp date = Date today
 					ifTrue: [stamp time printMinutes]
 					ifFalse: [stamp morseShortLocalPrintString].
-				self incomingAutoSyncRecency printAgo}
+				self incomingAutoSyncRecency morseAsWordsAgo}
 ]
 
 {
 	#category : #'accessing - toolbuilder',
-	#'squeak_changestamp' : 'ct 2/14/2026 19:08'
+	#'squeak_changestamp' : 'ct 2/16/2026 00:03'
 }
 MethodMorserTool >> basicAutoSyncOutgoingHelp [
 	<uses: #(lastOutgoingAutoSyncStamp hasIncompleteAutoSyncOutgoing outgoingAutoSyncRecency)>
@@ -324,12 +324,12 @@ MethodMorserTool >> basicAutoSyncOutgoingHelp [
 				{stamp date = Date today
 					ifTrue: [stamp time printMinutes]
 					ifFalse: [stamp morseShortLocalPrintString].
-				self outgoingAutoSyncRecency printAgo}
+				self outgoingAutoSyncRecency morseAsWordsAgo}
 ]
 
 {
 	#category : #'accessing - toolbuilder',
-	#'squeak_changestamp' : 'ct 2/14/2026 19:08'
+	#'squeak_changestamp' : 'ct 2/16/2026 00:03'
 }
 MethodMorserTool >> basicManualSyncButtonHelp [ 
 	<uses: #(lastManualSyncStamp manualSyncRecency)>
@@ -340,7 +340,7 @@ MethodMorserTool >> basicManualSyncButtonHelp [
 		{stamp date = Date today
 			ifTrue: [stamp time printMinutes]
 			ifFalse: [stamp morseShortLocalPrintString].
-		self manualSyncRecency printAgo}
+		self manualSyncRecency morseAsWordsAgo}
 ]
 
 {
