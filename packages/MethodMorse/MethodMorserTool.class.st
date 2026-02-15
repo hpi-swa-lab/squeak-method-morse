@@ -110,6 +110,19 @@ MethodMorserTool class >> unregisterFromWorldMenu [
 ]
 
 {
+	#category : #toolbuilder,
+	#'squeak_changestamp' : 'ct 2/16/2026 00:12'
+}
+MethodMorserTool >> addModelItemsToWindowMenu: menu [
+
+	super addModelItemsToWindowMenu: menu.
+	
+	(self class respondsTo: #appMenu:) ifTrue:
+		[menu addLine.
+		self class appMenu: menu].
+]
+
+{
 	#category : #actions,
 	#'squeak_changestamp' : 'ct 1/31/2026 22:00'
 }
