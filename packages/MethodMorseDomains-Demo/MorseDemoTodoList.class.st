@@ -162,7 +162,7 @@ MorseDemoTodoList >> removeItem: aDemoTodoItem [
 
 {
 	#category : #private,
-	#'squeak_changestamp' : 'ct 2/12/2026 16:18'
+	#'squeak_changestamp' : 'ct 2/21/2026 02:05'
 }
 MorseDemoTodoList >> reportChangeFrom: oldItem to: newItem [
 
@@ -172,7 +172,7 @@ MorseDemoTodoList >> reportChangeFrom: oldItem to: newItem [
 	self triggerEvent: #itemsChanged with:
 		(oldItem name = newItem name
 			ifTrue: [{self newChangeFrom: oldItem to: newItem}]
-			ifFalse: [{self newChangeFrom: oldItem to: nil. self newChangeFrom: nil to: newItem}]).
+			ifFalse: [{self newChangeFrom: oldItem to: nil. self newChangeFrom: nil to: newItem} reject: #isIdentical "if one side was nil"]).
 ]
 
 {
