@@ -578,12 +578,13 @@ MorseDemoTodoTool >> selectedList [
 
 {
 	#category : #updating,
-	#'squeak_changestamp' : 'ct 2/12/2026 16:17'
+	#'squeak_changestamp' : 'ct 2/21/2026 21:38'
 }
 MorseDemoTodoTool >> update: what [
 
 	what == self selectedList ifTrue:
-		[self changed: #selectedList].
+		[self changed: #selectedList.
+		(self items includes: self selectedItem) ifFalse: [self selectItem: nil]].
 	what == self selectedItem ifTrue:
 		[self changed: #selectedItem].
 	^ super update: what
