@@ -2,7 +2,8 @@ Class {
 	#name : #MorseItemHolder,
 	#superclass : #StringHolder,
 	#instVars : [
-		'item'
+		'item',
+		'oldItem'
 	],
 	#category : #'MethodMorse-UI'
 }
@@ -20,11 +21,11 @@ MorseItemHolder class >> on: anItem [
 
 {
 	#category : #browsing,
-	#'squeak_changestamp' : 'ct 2/12/2026 00:15'
+	#'squeak_changestamp' : 'ct 2/21/2026 21:48'
 }
 MorseItemHolder >> browse [
 
-	^ self item ifNotNil: #browse
+	^ self oldItem ifNotNil: #browse
 ]
 
 {
@@ -130,12 +131,14 @@ MorseItemHolder >> itemKey: aCharacter from: view [
 
 {
 	#category : #'item menu',
-	#'squeak_changestamp' : 'ct 2/12/2026 00:09'
+	#'squeak_changestamp' : 'ct 2/21/2026 21:50'
 }
 MorseItemHolder >> itemMenu: menu [
 	<itemMenuShifted: false>
 
-	menu add: 'inspect' target: self item selector: #inspect.
+	menu
+		add: 'browse (b)' target: self selector: #browse;
+		add: 'inspect' target: self item selector: #inspect.
 	menu addLine.
 	^ menu
 ]
@@ -151,9 +154,20 @@ MorseItemHolder >> itemMenu: menu shifted: aBoolean [
 
 {
 	#category : #accessing,
-	#'squeak_changestamp' : 'ct 2/2/2026 22:57'
+	#'squeak_changestamp' : 'ct 2/21/2026 21:49'
+}
+MorseItemHolder >> oldItem [
+
+	^ oldItem
+]
+
+{
+	#category : #accessing,
+	#'squeak_changestamp' : 'ct 2/21/2026 21:49'
 }
 MorseItemHolder >> oldItem: anItem [
+
+	oldItem := anItem.
 ]
 
 {
