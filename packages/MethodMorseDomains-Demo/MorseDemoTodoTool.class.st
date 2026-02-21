@@ -13,7 +13,7 @@ Class {
 }
 
 {
-	#category : #'as yet unclassified',
+	#category : #'instance creation',
 	#'squeak_changestamp' : 'ct 2/11/2026 22:12'
 }
 MorseDemoTodoTool class >> on: aDemoTodoBook [
