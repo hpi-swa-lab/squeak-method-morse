@@ -367,12 +367,13 @@ MethodMorserTool >> browseProject [
 
 {
 	#category : #actions,
-	#'squeak_changestamp' : 'ct 2/17/2026 00:15'
+	#'squeak_changestamp' : 'ct 2/17/2026 00:18'
 }
 MethodMorserTool >> browseProjectRemote [
 
-	^ (self morser remoteProjectFor: (self selectedProject ifNil: [^ self changed: #flash]))
-		browse
+	| project |
+	project := self selectedProject ifNil: [^ self changed: #flash].
+	^ project browse: (self morser remoteProjectFor: project)
 ]
 
 {
