@@ -54,7 +54,7 @@ MorseCodeProject >> applyChanges: changes [
 
 {
 	#category : #sync,
-	#'squeak_changestamp' : 'ct 2/13/2026 20:07'
+	#'squeak_changestamp' : 'ct 2/21/2026 02:32'
 }
 MorseCodeProject >> applyChanges: changes silently: aBoolean [
 
@@ -62,6 +62,9 @@ MorseCodeProject >> applyChanges: changes silently: aBoolean [
 	patch := MCPatch operations:
 		(changes gather: [:change |
 			change asMCOperationsIn: self environment]).
+	
+	self flag: #yaros. "This is due to two reasons: (i) optimization - localize all operations + definitions with one network send; (ii) install changes in right environment - Yaros currently does not transmit exceptions for Environment>>beCurrentDuring:, and avoid storing remote CompiledMethods in the target class."
+	patch := self makeLocalPatchFrom: patch.
 	
 	loader := MCPackageLoader new.
 	patch applyTo: loader.
@@ -94,9 +97,9 @@ MorseCodeProject >> applyChanges: changes silently: aBoolean [
 
 {
 	#category : #browsing,
-	#'squeak_changestamp' : 'ct 2/1/2026 04:55'
+	#'squeak_changestamp' : 'ct 2/21/2026 02:09'
 }
-MorseCodeProject >> browse [
+MorseCodeProject >> browse: aProject [
 
 	| browserClass |
 	self flag: #moveUpstream.
@@ -104,8 +107,8 @@ MorseCodeProject >> browse [
 	(browserClass canUnderstand: #selectPackageNamed:) ifFalse:
 		[browserClass := PackagePaneBrowser].
 	^ browserClass new
-		selectEnvironment: self environment;
-		selectPackageNamed: self package name;
+		selectEnvironment: aProject environment;
+		selectPackageNamed: aProject package name;
 		buildAndOpenFullBrowser
 ]
 
@@ -221,6 +224,17 @@ MorseCodeProject >> items [
 		[(self environment beCurrentDuring:
 			[self package classes , self package methods])
 				collect: [:ea | ea asMorseItemIn: self]]
+]
+
+{
+	#category : #private,
+	#'squeak_changestamp' : 'ct 2/17/2026 01:36'
+}
+MorseCodeProject >> makeLocalPatchFrom: aMCPatch [
+
+	| serialized |
+	serialized := aMCPatch morseSerialized.
+	^ MCPatch morseDeserialize: serialized
 ]
 
 {

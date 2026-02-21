@@ -22,12 +22,13 @@ MorseCodeItem class >> forDefinition: aMCDefinition project: aCodeProject [
 
 {
 	#category : #comparing,
-	#'squeak_changestamp' : 'ct 2/1/2026 05:14'
+	#'squeak_changestamp' : 'ct 2/21/2026 01:11'
 }
 MorseCodeItem >> = anObject [
 
 	self == anObject ifTrue: [^ true].
-	self class = anObject class ifFalse: [^ false].
+	self flag: #(workaround yaros).
+	(self perform: #class) name = (anObject perform: #class) name ifFalse: [^ false].
 	^ self definition = anObject definition
 ]
 

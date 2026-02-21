@@ -30,6 +30,15 @@ GSMetadata {
 				#name : 'MethodMorseDomains-Demo'
 			},
 			#path : @5
+		},
+		GSTonelMapper {
+			#version : 1,
+			#package : MCPackage {
+				#name : 'MethodMorseServers-Yaros'
+			},
+			#path : FSAbsolutePath [
+				'packages'
+			]
 		}
 	],
 	#name : 'squeak-method-morse'

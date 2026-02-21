@@ -15,12 +15,20 @@ MorseProject >> applyChanges: changes [
 
 {
 	#category : #browsing,
-	#'squeak_changestamp' : 'ct 2/1/2026 03:53'
+	#'squeak_changestamp' : 'ct 2/17/2026 00:18'
 }
 MorseProject >> browse [
 
-	self flag: #subclassResponsibility.
-	^ super browse
+	^ self browse: self
+]
+
+{
+	#category : #browsing,
+	#'squeak_changestamp' : 'ct 2/21/2026 02:10'
+}
+MorseProject >> browse: aProject [
+
+	^ self subclassResponsibility
 ]
 
 {

@@ -6,7 +6,7 @@ Class {
 
 {
 	#category : #baseline,
-	#'squeak_changestamp' : 'ct 2/14/2026 19:26'
+	#'squeak_changestamp' : 'ct 2/21/2026 21:55'
 }
 BaselineOfMethodMorse >> baseline: spec [
 	<baseline>
@@ -15,7 +15,9 @@ BaselineOfMethodMorse >> baseline: spec [
 		"dependencies"
 		spec
 			baseline: 'CtAppFramework' with:
-				[spec repository: 'github://LinqLover/squeak-appframework:main'].
+				[spec repository: 'github://LinqLover/squeak-appframework:main'];
+			baseline: 'Yaros' with:
+				[spec repository: 'github://LinqLover/yaros:main'].
 		
 		"packages"
 		spec
@@ -23,11 +25,13 @@ BaselineOfMethodMorse >> baseline: spec [
 			package: 'MethodMorseDomains-Code' with:
 				[spec requires: 'MethodMorse'];
 			package: 'MethodMorseDomains-Demo' with:
-				[spec requires: 'MethodMorse'].
+				[spec requires: 'MethodMorse'];
+			package: 'MethodMorseServers-Yaros' with:
+				[spec requires: #('MethodMorse' 'Yaros')].
 		
 		"groups"
 		spec
-			group: #small with: #('MethodMorse' 'MethodMorseDomains-Code' 'MethodMorseDomains-Demo');
+			group: #small with: #('MethodMorse' 'MethodMorseDomains-Code' 'MethodMorseDomains-Demo' 'MethodMorseServers-Yaros');
 			group: #default with: #(small 'CtAppFramework')].
 ]
 

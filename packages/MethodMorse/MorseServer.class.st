@@ -9,13 +9,22 @@ Class {
 
 {
 	#category : #accessing,
-	#'squeak_changestamp' : 'ct 2/14/2026 19:32'
+	#'squeak_changestamp' : 'ct 2/16/2026 20:16'
 }
 MorseServer class >> allConnectionSpecs [
 
 	^ (self withAllSubclasses
 		reject: #isAbstract)
-			collect: #connectionSpec
+			sortedSafely collect: #connectionSpec
+]
+
+{
+	#category : #accessing,
+	#'squeak_changestamp' : 'ct 2/21/2026 22:38'
+}
+MorseServer class >> connectionSpec [
+
+	^ self subclassResponsibility
 ]
 
 {

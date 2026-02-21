@@ -12,12 +12,13 @@ Class {
 
 {
 	#category : #comparing,
-	#'squeak_changestamp' : 'ct 2/12/2026 00:13'
+	#'squeak_changestamp' : 'ct 2/21/2026 02:07'
 }
 MorseDemoTodoItem >> = anotherItem [
 
 	self == anotherItem ifTrue: [^ true].
-	anotherItem class = self class ifFalse: [^ false].
+	self flag: #(workaround yaros).
+	(self perform: #class) name = (anotherItem perform: #class) name ifFalse: [^ false].
 	^ {self name. self text. self labels} = {anotherItem name. anotherItem text. anotherItem labels}
 ]
 

@@ -15,6 +15,22 @@ Class {
 }
 
 {
+	#category : #'dependents access',
+	#'squeak_changestamp' : 'ct 2/21/2026 00:55'
+}
+MethodMorser >> addDependent: anObject [
+
+	self flag: #(workaround yaros). "Yaros currently cannot keep weak referenced proxies"
+	((thisContext objectClass: anObject) withAllSuperclasses anySatisfy: [:c | c name = #YarosRemoteObject]) ifFalse: [^ super addDependent: anObject].
+	
+	(self dependents includes: anObject) ifTrue: [^ anObject].
+	strongDependents := strongDependents
+		ifNil: [{anObject}]
+		ifNotNil: [strongDependents copyWith: anObject].
+	^ anObject
+]
+
+{
 	#category : #accessing,
 	#'squeak_changestamp' : 'ct 2/17/2026 00:10'
 }
@@ -108,6 +124,16 @@ MethodMorser >> autoSyncOutgoingEnabled: aBoolean [
 MethodMorser >> autoSynchronizer [
 
 	^ autoSynchronizer
+]
+
+{
+	#category : #'dependents access',
+	#'squeak_changestamp' : 'ct 2/21/2026 00:57'
+}
+MethodMorser >> breakDependents [
+
+	super breakDependents.
+	strongDependents := nil.
 ]
 
 {
@@ -269,6 +295,17 @@ MethodMorser >> lastSyncStamp: aDateAndTime [
 ]
 
 {
+	#category : #'dependents access',
+	#'squeak_changestamp' : 'ct 2/21/2026 00:56'
+}
+MethodMorser >> myDependents [
+
+	^ strongDependents
+		ifNil: [super myDependents]
+		ifNotNil: [super myDependents , strongDependents]
+]
+
+{
 	#category : #sync,
 	#'squeak_changestamp' : 'ct 2/14/2026 20:02'
 }
@@ -381,13 +418,15 @@ MethodMorser >> remoteMorser [
 
 {
 	#category : #accessing,
-	#'squeak_changestamp' : 'ct 2/11/2026 19:23'
+	#'squeak_changestamp' : 'ct 2/17/2026 01:46'
 }
 MethodMorser >> remoteMorser: aMethodMorser [
 
-	self remoteMorser ifNotNil:
-		[self remoteMorser removeDependent: self].
+	| old |
+	old := self remoteMorser.
 	remoteMorser := aMethodMorser.
+	old ifNotNil:
+		[old removeDependent: self].
 	self remoteMorser ifNotNil:
 		[self remoteMorser addDependent: self].
 ]
@@ -424,6 +463,21 @@ MethodMorser >> remoteProjectsFor: projects [
 MethodMorser >> remoteSpacesFor: spaces [
 
 	^ self remoteMorser spacesWithNames: (spaces collect: #name)
+]
+
+{
+	#category : #'dependents access',
+	#'squeak_changestamp' : 'ct 2/21/2026 00:57'
+}
+MethodMorser >> removeDependent: anObject [
+
+	self flag: #(workaround yaros). "Yaros currently cannot keep weak referenced proxies"
+	((thisContext objectClass: anObject) withAllSuperclasses anySatisfy: [:c | c name = #YarosRemoteObject]) ifFalse: [^ super removeDependent: anObject].
+	
+	(self dependents includes: anObject) ifFalse: [^ anObject].
+	strongDependents ifNotNil:
+		[strongDependents := (strongDependents copyWithout: anObject) ifEmpty: [nil]].
+	^ anObject
 ]
 
 {
@@ -474,17 +528,20 @@ MethodMorser >> server [
 
 {
 	#category : #accessing,
-	#'squeak_changestamp' : 'ct 2/1/2026 00:31'
+	#'squeak_changestamp' : 'ct 2/16/2026 21:09'
 }
 MethodMorser >> server: aMorseServer [
 
 	self server ifNotNil:
-		[self stopConnection.
+		[self server morser: nil.
+		self stopConnection.
 		self server removeActionsWithReceiver: self].
 	
 	server := aMorseServer.
 	
 	self server
+		ifNil: [^ self];
+		morser: self;
 		when: #started send: #noteServerStarted to: self;
 		when: #stopped send: #noteServerStopped to: self.
 ]
