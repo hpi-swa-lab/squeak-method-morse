@@ -2,7 +2,8 @@ Class {
 	#name : #MorseCodeSpace,
 	#superclass : #MorseSpace,
 	#instVars : [
-		'environment'
+		'environment',
+		'name'
 	],
 	#category : #'MethodMorseDomains-Code'
 }
@@ -58,11 +59,21 @@ MorseCodeSpace >> hash [
 
 {
 	#category : #accessing,
-	#'squeak_changestamp' : 'ct 2/1/2026 01:05'
+	#'squeak_changestamp' : 'ct 2/17/2026 00:12'
 }
 MorseCodeSpace >> name [
 
-	^ self environment name
+	^ name ifNil: [self environment name]
+]
+
+{
+	#category : #accessing,
+	#'squeak_changestamp' : 'ct 2/21/2026 02:33'
+}
+MorseCodeSpace >> name: aStringOrNil [
+	"Debugging convenience, mainly used for testing remote connections by mapping multiple environments in the same image to each other."
+
+	name := aStringOrNil.
 ]
 
 {

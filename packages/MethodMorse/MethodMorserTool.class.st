@@ -6,7 +6,6 @@ Class {
 	#instVars : [
 		'morser',
 		'environment',
-		'extraSpaces',
 		'selectedProjectIndex',
 		'allSelectedProjects'
 	],
@@ -167,11 +166,11 @@ MethodMorserTool >> allSelectedProjects [
 
 {
 	#category : #private,
-	#'squeak_changestamp' : 'ct 2/11/2026 23:14'
+	#'squeak_changestamp' : 'ct 2/16/2026 23:28'
 }
 MethodMorserTool >> allSpaces [
 
-	^ {MorseCodeSpace forEnvironment: self environment} , (self extraSpaces ifNil: [#()])
+	^ self morser spaces
 ]
 
 {
@@ -368,11 +367,11 @@ MethodMorserTool >> browseProject [
 
 {
 	#category : #actions,
-	#'squeak_changestamp' : 'ct 2/1/2026 19:48'
+	#'squeak_changestamp' : 'ct 2/17/2026 00:15'
 }
 MethodMorserTool >> browseProjectRemote [
 
-	^ (self morser server remoteProjectFor: (self selectedProject ifNil: [^ self changed: #flash]))
+	^ (self morser remoteProjectFor: (self selectedProject ifNil: [^ self changed: #flash]))
 		browse
 ]
 
@@ -686,24 +685,6 @@ MethodMorserTool >> environment: anEnvironment [
 ]
 
 {
-	#category : #accessing,
-	#'squeak_changestamp' : 'ct 2/11/2026 23:14'
-}
-MethodMorserTool >> extraSpaces [
-
-	^ extraSpaces
-]
-
-{
-	#category : #accessing,
-	#'squeak_changestamp' : 'ct 2/11/2026 23:14'
-}
-MethodMorserTool >> extraSpaces: aCollection [
-
-	extraSpaces := aCollection.
-]
-
-{
 	#category : #testing,
 	#'squeak_changestamp' : 'ct 2/2/2026 02:19'
 }
@@ -769,13 +750,14 @@ MethodMorserTool >> initialExtent [
 
 {
 	#category : #'initialize-release',
-	#'squeak_changestamp' : 'ct 2/1/2026 02:42'
+	#'squeak_changestamp' : 'ct 2/16/2026 23:46'
 }
 MethodMorserTool >> initialize [
 
 	super initialize.
 	
 	self morser: MethodMorser new.
+	self environment: nil.
 	selectedProjectIndex := 0.
 	allSelectedProjects := Set new.
 ]
@@ -932,18 +914,13 @@ MethodMorserTool >> morser [
 
 {
 	#category : #accessing,
-	#'squeak_changestamp' : 'ct 2/1/2026 05:44'
+	#'squeak_changestamp' : 'ct 2/21/2026 21:30'
 }
 MethodMorserTool >> morser: aMethodMorser [
 
 	self morser removeDependent: self.
-	
 	morser := aMethodMorser.
-	
 	self morser addDependent: self.
-	self morser server ifNotNil: [:server |
-		server remoteSpaces ifNotEmpty: [:spaces |
-			self environment: spaces keys anyOne environment]].
 	
 	self changed: #morser.
 ]
@@ -1126,6 +1103,23 @@ MethodMorserTool >> selectedProjectIndex: anInteger [
 
 	selectedProjectIndex := anInteger.
 	self changed: #selectedProjectIndex.
+]
+
+{
+	#category : #'as yet unclassified',
+	#'squeak_changestamp' : 'ct 2/21/2026 21:22'
+}
+MethodMorserTool >> setUpEnvironmentExample [
+
+	self environment: Object newEnvironment.
+	self environment packageOrganizer
+		registerPackageNamed: 'As yet unclassified';
+		registerPackageNamed: 'Kernel'.
+	self environment organization
+		addCategory: 'Kernel-Objects';
+		addCategory: 'as yet unclassified';
+		classify: #Object under: 'Kernel-Objects'.
+	self morser spaces first name: 'Smalltalk'.
 ]
 
 {

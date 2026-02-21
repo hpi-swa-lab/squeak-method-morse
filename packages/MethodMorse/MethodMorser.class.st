@@ -4,26 +4,19 @@ Class {
 	#instVars : [
 		'server',
 		'remoteMorser',
+		'spaces',
 		'projects',
 		'autoSynchronizer',
 		'lastSyncStamps',
-		'currentSyncChanges'
+		'currentSyncChanges',
+		'strongDependents'
 	],
 	#category : #MethodMorse
 }
 
 {
-	#category : #'instance creation',
-	#'squeak_changestamp' : 'ct 2/1/2026 02:38'
-}
-MethodMorser class >> open [
-
-	^ self new open
-]
-
-{
 	#category : #accessing,
-	#'squeak_changestamp' : 'ct 2/1/2026 02:53'
+	#'squeak_changestamp' : 'ct 2/17/2026 00:10'
 }
 MethodMorser >> addProjects: someProjects [
 
@@ -35,7 +28,16 @@ MethodMorser >> addProjects: someProjects [
 	self changed: #projects.
 	
 	self isConnected ifTrue:
-		[self server addProjects: newProjects].
+		[self remoteMorser addProjects: (self remoteProjectsFor: newProjects)].
+]
+
+{
+	#category : #accessing,
+	#'squeak_changestamp' : 'ct 2/16/2026 23:29'
+}
+MethodMorser >> addSpace: aSpace [
+
+	^ self spaces add: aSpace
 ]
 
 {
@@ -151,12 +153,13 @@ MethodMorser >> hasIncompleteAutoSyncOutgoing [
 
 {
 	#category : #'initialize-release',
-	#'squeak_changestamp' : 'ct 2/11/2026 19:27'
+	#'squeak_changestamp' : 'ct 2/16/2026 23:25'
 }
 MethodMorser >> initialize [
 
 	super initialize.
 	
+	spaces := OrderedCollection new.
 	projects := OrderedCollection new.
 	autoSynchronizer := MorseAutoSynchronizer newFor: self.
 	autoSynchronizer addDependent: self.
@@ -390,8 +393,42 @@ MethodMorser >> remoteMorser: aMethodMorser [
 ]
 
 {
+	#category : #private,
+	#'squeak_changestamp' : 'ct 2/1/2026 02:01'
+}
+MethodMorser >> remoteProjectFor: aProject [
+
+	^ (self remoteProjectsFor: {aProject}) first
+]
+
+{
+	#category : #private,
+	#'squeak_changestamp' : 'ct 2/14/2026 22:35'
+}
+MethodMorser >> remoteProjectsFor: projects [
+
+	| groupedProjects mappedSpaces mappedProjects |
+	groupedProjects := projects groupBy: #space.
+	mappedSpaces := self remoteSpacesFor: groupedProjects keys.
+	mappedProjects := Dictionary new.
+	mappedSpaces with: groupedProjects values do: [:remoteSpace :group |
+		mappedProjects morseAtAll: group putAll:
+			(remoteSpace projectsWithAllNames: (group collect: #name))].
+	^ mappedProjects morseAtAll: projects
+]
+
+{
+	#category : #private,
+	#'squeak_changestamp' : 'ct 2/16/2026 23:32'
+}
+MethodMorser >> remoteSpacesFor: spaces [
+
+	^ self remoteMorser spacesWithNames: (spaces collect: #name)
+]
+
+{
 	#category : #accessing,
-	#'squeak_changestamp' : 'ct 2/1/2026 02:53'
+	#'squeak_changestamp' : 'ct 2/17/2026 00:13'
 }
 MethodMorser >> removeProjects: someProjects [
 
@@ -403,7 +440,16 @@ MethodMorser >> removeProjects: someProjects [
 	self changed: #projects.
 	
 	self isConnected ifTrue:
-		[self server removeProjects: oldProjects].
+		[self remoteMorser removeProjects: (self remoteProjectsFor: oldProjects)].
+]
+
+{
+	#category : #accessing,
+	#'squeak_changestamp' : 'ct 2/16/2026 23:29'
+}
+MethodMorser >> removeSpace: aSpace [
+
+	^ self spaces remove: aSpace
 ]
 
 {
@@ -445,33 +491,42 @@ MethodMorser >> server: aMorseServer [
 
 {
 	#category : #'as yet unclassified',
-	#'squeak_changestamp' : 'ct 2/13/2026 20:12'
+	#'squeak_changestamp' : 'ct 2/21/2026 21:21'
 }
-MethodMorser >> setUpLocalExample [
+MethodMorser >> setUpTodoExample [
 
-	| remoteEnvironment remoteBook  |
-	remoteEnvironment := Object newEnvironment.
-	self server remoteSpaces at: (MorseCodeSpace forEnvironment: Smalltalk environment) put: (MorseCodeSpace forEnvironment: remoteEnvironment).
-	remoteEnvironment packageOrganizer
-		registerPackageNamed: 'As yet unclassified';
-		registerPackageNamed: 'Kernel'.
-	remoteEnvironment organization
-		addCategory: 'Kernel-Objects';
-		addCategory: 'as yet unclassified';
-		classify: #Object under: 'Kernel-Objects'.
-	
-	(Smalltalk classNamed: #MorseDemoTodoBook) ifNotNil: [:bookClass |
-		| localBook |
-		localBook := bookClass new.
-		remoteBook := bookClass new.
-		self server remoteSpaces at: localBook put: remoteBook.
-		{localBook. remoteBook} do: [:book |
-			book addListNamed: 'Todo List #1'].
-		self dependents first extraSpaces: ((self dependents first extraSpaces ifNil: [#()]) copyWith: localBook)].
-	
-	self server makeRemoteMorserFor: self.
-	self server remoteMorser open.
-	self server remoteMorser dependents first extraSpaces: (((self server remoteMorser dependents first extraSpaces ifNil: [#()]) copyWith: remoteBook) copyWithout: nil).
+	| localBook |
+	localBook := MorseDemoTodoBook new.
+	localBook addListNamed: 'Todo List #1'.
+	self addSpace: localBook.
+]
+
+{
+	#category : #accessing,
+	#'squeak_changestamp' : 'ct 2/16/2026 23:25'
+}
+MethodMorser >> spaces [
+
+	^ spaces
+]
+
+{
+	#category : #accessing,
+	#'squeak_changestamp' : 'ct 2/16/2026 23:25'
+}
+MethodMorser >> spaces: aCollection [
+
+	spaces := spaces.
+]
+
+{
+	#category : #accessing,
+	#'squeak_changestamp' : 'ct 2/16/2026 23:33'
+}
+MethodMorser >> spacesWithNames: names [
+
+	^ names collect: [:name |
+		self spaces detect: [:ea | ea name = name]]
 ]
 
 {

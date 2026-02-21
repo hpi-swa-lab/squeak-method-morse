@@ -59,18 +59,18 @@ MorseLocalServer >> isRunning [
 
 {
 	#category : #support,
-	#'squeak_changestamp' : 'ct 2/1/2026 02:45'
+	#'squeak_changestamp' : 'ct 2/21/2026 21:33'
 }
-MorseLocalServer >> makeRemoteMorserFor: localMorser [
+MorseLocalServer >> makeRemoteMorser [
 
 	| morser |
 	morser := MethodMorser new.
 	morser server:
 		(self species new
-			remoteMorser: localMorser;
-			remoteSpaces: (self remoteSpaces associations collect: [:assoc | assoc value -> assoc key] as: Dictionary);
+			remoteMorser: self morser;
 			yourself).
 	self remoteMorser: morser.
+	^ morser
 ]
 
 {
@@ -89,22 +89,6 @@ MorseLocalServer >> remoteMorser [
 MorseLocalServer >> remoteMorser: aMethodMorser [
 
 	remoteMorser := aMethodMorser.
-]
-
-{
-	#category : #accessing,
-	#'squeak_changestamp' : 'ct 2/14/2026 22:35'
-}
-MorseLocalServer >> remoteProjectsFor: projects [
-
-	| groupedProjects mappedSpaces mappedProjects |
-	groupedProjects := projects groupBy: #space.
-	mappedSpaces := self remoteSpacesFor: groupedProjects keys.
-	mappedProjects := Dictionary new.
-	mappedSpaces with: groupedProjects values do: [:remoteSpace :group |
-		mappedProjects morseAtAll: group putAll:
-			(remoteSpace projectsWithAllNames: (group collect: #name))].
-	^ mappedProjects morseAtAll: projects
 ]
 
 {
@@ -132,17 +116,6 @@ MorseLocalServer >> remoteSpaces [
 MorseLocalServer >> remoteSpaces: aDictionary [
 
 	remoteSpaces := aDictionary.
-]
-
-{
-	#category : #accessing,
-	#'squeak_changestamp' : 'ct 2/14/2026 22:35'
-}
-MorseLocalServer >> remoteSpacesFor: spaces [
-
-	self isRunning ifFalse: [self error: 'server not running'].
-	self remoteServer isRunning ifFalse: [self error: 'remote server not running'].
-	^ self remoteSpaces morseAtAll: spaces
 ]
 
 {

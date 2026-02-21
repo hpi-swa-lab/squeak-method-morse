@@ -1,6 +1,9 @@
 Class {
 	#name : #MorseServer,
 	#superclass : #Object,
+	#instVars : [
+		'morser'
+	],
 	#category : #MethodMorse
 }
 
@@ -34,15 +37,6 @@ MorseServer class >> editConnection [
 MorseServer class >> isAbstract [
 
 	^ self class = thisContext methodClass
-]
-
-{
-	#category : #accessing,
-	#'squeak_changestamp' : 'ct 2/1/2026 00:46'
-}
-MorseServer >> addProjects: newProjects [
-
-	self remoteMorser addProjects: (self remoteProjectsFor: newProjects).
 ]
 
 {
@@ -92,38 +86,29 @@ MorseServer >> isRunning [
 
 {
 	#category : #accessing,
+	#'squeak_changestamp' : 'ct 2/16/2026 21:07'
+}
+MorseServer >> morser [
+
+	^ morser
+]
+
+{
+	#category : #accessing,
+	#'squeak_changestamp' : 'ct 2/16/2026 21:07'
+}
+MorseServer >> morser: aMethodMorser [
+
+	morser := aMethodMorser.
+]
+
+{
+	#category : #accessing,
 	#'squeak_changestamp' : 'ct 2/11/2026 00:26'
 }
 MorseServer >> remoteMorser [
 
 	^ self subclassResponsibility
-]
-
-{
-	#category : #accessing,
-	#'squeak_changestamp' : 'ct 2/1/2026 02:01'
-}
-MorseServer >> remoteProjectFor: aProject [
-
-	^ (self remoteProjectsFor: {aProject}) first
-]
-
-{
-	#category : #accessing,
-	#'squeak_changestamp' : 'ct 2/1/2026 00:46'
-}
-MorseServer >> remoteProjectsFor: projects [
-
-	^ self subclassResponsibility
-]
-
-{
-	#category : #accessing,
-	#'squeak_changestamp' : 'ct 2/1/2026 01:47'
-}
-MorseServer >> removeProjects: newProjects [
-
-	self remoteMorser removeProjects: (self remoteProjectsFor: newProjects).
 ]
 
 {
