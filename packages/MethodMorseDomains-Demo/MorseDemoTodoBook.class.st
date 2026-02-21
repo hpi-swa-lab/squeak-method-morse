@@ -90,6 +90,18 @@ MorseDemoTodoBook >> open [
 
 {
 	#category : #browsing,
+	#'squeak_changestamp' : 'ct 2/21/2026 21:41'
+}
+MorseDemoTodoBook >> openItem: aDemoTodoItem [
+
+	^ (MorseDemoTodoTool on: self)
+		selectList: aDemoTodoItem list;
+		selectItem: aDemoTodoItem;
+		open
+]
+
+{
+	#category : #browsing,
 	#'squeak_changestamp' : 'ct 2/11/2026 23:31'
 }
 MorseDemoTodoBook >> openList: aDemoTodoList [

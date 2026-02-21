@@ -47,11 +47,11 @@ MorseDemoTodoItem >> asStringOrText [
 
 {
 	#category : #browsing,
-	#'squeak_changestamp' : 'ct 2/12/2026 00:15'
+	#'squeak_changestamp' : 'ct 2/21/2026 21:42'
 }
 MorseDemoTodoItem >> browse [
 
-	^ self list browse
+	^ self list browseItem: self
 ]
 
 {

@@ -111,6 +111,15 @@ MorseDemoTodoList >> browse: aProject [
 ]
 
 {
+	#category : #browsing,
+	#'squeak_changestamp' : 'ct 2/21/2026 21:42'
+}
+MorseDemoTodoList >> browseItem: anItem [
+
+	^ self book openItem: anItem
+]
+
+{
 	#category : #'initialize-release',
 	#'squeak_changestamp' : 'ct 2/11/2026 22:55'
 }
