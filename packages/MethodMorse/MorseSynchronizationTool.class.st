@@ -170,6 +170,15 @@ MorseSynchronizationTool >> basicUnresolveDiff: aDiff [
 ]
 
 {
+	#category : #actions,
+	#'squeak_changestamp' : 'ct 2/21/2026 02:15'
+}
+MorseSynchronizationTool >> browseRemoteItem [
+
+	^ (self remoteItemModel ifNil: [^ self changed: #flash]) browse
+]
+
+{
 	#category : #toolbuilder,
 	#'squeak_changestamp' : 'ct 2/2/2026 18:36'
 }
@@ -702,7 +711,7 @@ MorseSynchronizationTool >> diffItemLocalLabelFor: aDiff [
 
 {
 	#category : #menus,
-	#'squeak_changestamp' : 'ct 2/11/2026 16:49'
+	#'squeak_changestamp' : 'ct 2/21/2026 02:14'
 }
 MorseSynchronizationTool >> diffItemMenu: menu shifted: aBoolean [
 	<diffMenu>
@@ -723,6 +732,10 @@ MorseSynchronizationTool >> diffItemMenu: menu shifted: aBoolean [
 		tmpMenu := model itemMenu: tmpMenu shifted: aBoolean.
 		tmpMenu items removeAllSuchThat: [:item | item contents = 'more...'].
 		menu addAllFrom: (builder buildPluggableMenu: tmpMenu)].
+	
+	aBoolean ifFalse:
+		[menu addLine.
+		menu add: 'browse remote' action: #browseRemoteItem].
 	^ menu
 ]
 
@@ -780,13 +793,14 @@ MorseSynchronizationTool >> diffMenu: menu shifted: shifted [
 
 {
 	#category : #menus,
-	#'squeak_changestamp' : 'ct 2/10/2026 20:05'
+	#'squeak_changestamp' : 'ct 2/21/2026 22:19'
 }
 MorseSynchronizationTool >> diffMenuMore: aMenu [
 	<diffMenuShifted: false>
 	<menuPriority: 1000>
 
 	^ aMenu
+		addLine;
 		add: 'more...' action: #offerShiftedDiffMenu;
 		yourself
 
@@ -1455,13 +1469,14 @@ MorseSynchronizationTool >> setItemModelForSite: siteOrNil to: newModel [
 
 {
 	#category : #menus,
-	#'squeak_changestamp' : 'ct 2/10/2026 20:05'
+	#'squeak_changestamp' : 'ct 2/21/2026 22:19'
 }
 MorseSynchronizationTool >> shiftedDiffMenuMore: aMenu [
 	<diffMenuShifted: true>
 	<menuPriority: 1000>
 
 	^ aMenu
+		addLine;
 		add: 'more...' action: #offerUnshiftedDiffMenu;
 		yourself
 

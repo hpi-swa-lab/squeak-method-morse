@@ -89,6 +89,15 @@ MorseCodeItemHolder >> annotation: aStringOrText [
 ]
 
 {
+	#category : #'item menu',
+	#'squeak_changestamp' : 'ct 2/21/2026 21:44'
+}
+MorseCodeItemHolder >> browse [
+
+	^ self browseMethodFull
+]
+
+{
 	#category : #toolbuilder,
 	#'squeak_changestamp' : 'ct 2/10/2026 21:20'
 }
