@@ -33,7 +33,7 @@ MorseProject >> browse: aProject [
 
 {
 	#category : #comparing,
-	#'squeak_changestamp' : 'ct 2/12/2026 00:14'
+	#'squeak_changestamp' : 'ct 2/21/2026 02:04'
 }
 MorseProject >> compare: local with: remote from: remoteProject [
 
@@ -42,14 +42,14 @@ MorseProject >> compare: local with: remote from: remoteProject [
 	remoteItems := remote items collect: [:ea | ea name -> ea] as: Dictionary.
 	modifications := ((localItems keys intersection: remoteItems keys)
 		collect: [:key |
-			MorseChange from: (localItems at: key) to: (remoteItems at: key)])
+			self newChangeFrom: (localItems at: key) to: (remoteItems at: key)])
 				reject: #isIdentical.
 	additions := (remoteItems keys copyWithoutAll: localItems keys)
 		collect: [:key |
-			MorseChange from: nil to: (remoteItems at: key)].
+			self newChangeFrom: nil to: (remoteItems at: key)].
 	removals := (localItems keys copyWithoutAll: remoteItems keys)
 		collect: [:key |
-			MorseChange from: (localItems at: key) to: nil].
+			self newChangeFrom: (localItems at: key) to: nil].
 	^ modifications , additions , removals
 ]
 
