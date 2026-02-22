@@ -473,7 +473,7 @@ MethodMorserTool >> buildConnectionBarWith: builder [
 
 {
 	#category : #toolbuilder,
-	#'squeak_changestamp' : 'ct 1/31/2026 22:36'
+	#'squeak_changestamp' : 'ct 2/22/2026 23:39'
 }
 MethodMorserTool >> buildEditConnectionButtonWith: builder [
 
@@ -481,6 +481,7 @@ MethodMorserTool >> buildEditConnectionButtonWith: builder [
 		model: self;
 		label: 'edit connection';
 		action: #editConnection;
+		help: #connectionHelp;
 		yourself
 ]
 
@@ -652,6 +653,16 @@ MethodMorserTool >> connectionColor [
 ]
 
 {
+	#category : #'accessing - toolbuilder',
+	#'squeak_changestamp' : 'ct 2/22/2026 23:40'
+}
+MethodMorserTool >> connectionHelp [
+	<uses: #morserServer>
+
+	^ self morserServer ifNotNil: #connectionLabel
+]
+
+{
 	#category : #'toolbuilder - constants',
 	#'squeak_changestamp' : 'ct 1/31/2026 21:48'
 }
@@ -674,21 +685,23 @@ MethodMorserTool >> doManualSync [
 
 {
 	#category : #actions,
-	#'squeak_changestamp' : 'ct 2/1/2026 02:29'
+	#'squeak_changestamp' : 'ct 2/22/2026 23:57'
 }
 MethodMorserTool >> editConnection [
 
 	| currentSpec specs spec |
-	currentSpec := self morser server ifNotNil: #connectionSpec.
+	currentSpec := self morserServer ifNotNil: #connectionSpec.
 	specs := self allConnectionSpecs collect: [:ea |
 		ea connectionType = (currentSpec ifNotNil: #connectionType)
-			ifTrue: [currentSpec]
+			ifTrue: [currentSpec in: [:it | currentSpec := nil. it]]
 			ifFalse: [ea]].
+	currentSpec ifNotNil: [specs := specs copyWithFirst: currentSpec].
 	spec := Project uiManager
 		chooseFromLabeledValues: (specs collect: [:ea | ea connectionLabel -> ea] as: OrderedDictionary)
 		"initialSelection: currentSpec".
 	spec ifNil: [^ self].
 	self morser server: (spec editConnection ifNil: [^ self]).
+	self changed: #morserServer.
 ]
 
 {
@@ -861,12 +874,15 @@ MethodMorserTool >> isProjectSelectedAt: anInteger [
 
 {
 	#category : #toolbuilder,
-	#'squeak_changestamp' : 'ct 2/10/2026 21:45'
+	#'squeak_changestamp' : 'ct 2/22/2026 23:38'
 }
 MethodMorserTool >> labelString [
+	<uses: #(environment morserServer)>
 
 	| title |
 	title := 'Method Morser'.
+	self morserServer ifNotNil: [:server |
+		title := '{1}({2})' format: {title. server connectionLabel}].
 	^ self environment = self class environment
 		ifTrue: [title]
 		ifFalse: ['{1} on {2}' format: {title. self environment name}]
@@ -966,6 +982,15 @@ MethodMorserTool >> morser: aMethodMorser [
 	self morser addDependent: self.
 	
 	self changed: #morser.
+]
+
+{
+	#category : #accessing,
+	#'squeak_changestamp' : 'ct 2/22/2026 23:38'
+}
+MethodMorserTool >> morserServer [
+
+	^ self morser server
 ]
 
 {

@@ -138,20 +138,27 @@ MorseYarosServer >> connectTo: aRemoteMorser [
 
 {
 	#category : #connection,
-	#'squeak_changestamp' : 'ct 2/16/2026 20:36'
+	#'squeak_changestamp' : 'ct 2/22/2026 23:55'
 }
 MorseYarosServer >> connectionLabel [
 
-	^ self class connectionLabel
+	| label |
+	label := self class connectionLabel.
+	self yarosType ifNotNil: [:type |
+		label := '{1} {2}' format: {label. type}].
+	^ label
 ]
 
 {
 	#category : #connection,
-	#'squeak_changestamp' : 'ct 2/16/2026 20:36'
+	#'squeak_changestamp' : 'ct 2/22/2026 23:55'
 }
 MorseYarosServer >> connectionType [
 
-	^ self class connectionType
+	| type |
+	type := self class connectionType.
+	type := (type , (self yarosType ifNil: [#other]) capitalized) asSymbol.
+	^ type
 ]
 
 {
@@ -305,4 +312,16 @@ MorseYarosServer >> stop [
 MorseYarosServer >> yarosServer [
 
 	^ yarosServer
+]
+
+{
+	#category : #connection,
+	#'squeak_changestamp' : 'ct 2/22/2026 23:54'
+}
+MorseYarosServer >> yarosType [
+
+	^ #(client server)
+		detect: [:subtype |
+			self yarosServer printString includesSubstring: subtype]
+		ifNone: [nil]
 ]
