@@ -1223,7 +1223,7 @@ MorseSynchronizationTool >> morser: aMorser [
 
 {
 	#category : #'private - item models',
-	#'squeak_changestamp' : 'ct 2/10/2026 21:05'
+	#'squeak_changestamp' : 'ct 2/22/2026 00:59'
 }
 MorseSynchronizationTool >> newItemModelForSite: siteOrNil [
 
@@ -1231,7 +1231,7 @@ MorseSynchronizationTool >> newItemModelForSite: siteOrNil [
 	diff := self selectedDiff ifNil: [^ nil].
 	
 	model := ((self itemForItemModelForSite: siteOrNil)
-		ifNotNil: [:item | item = #divergent ifFalse: [item newContentModel]])
+		ifNotNil: [:item | item = #divergent ifFalse: [diff project newItemContentModelFor: item]])
 			ifNil: [diff project newItemContentModel].
 	model siteName: siteOrNil.
 	model

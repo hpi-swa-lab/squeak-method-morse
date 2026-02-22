@@ -102,6 +102,17 @@ MorseProject >> newItemContentModel [
 ]
 
 {
+	#category : #'*MethodMorse-UI',
+	#'squeak_changestamp' : 'ct 2/22/2026 00:59'
+}
+MorseProject >> newItemContentModelFor: anItem [
+
+	^ self newItemContentModel
+		item: anItem;
+		yourself
+]
+
+{
 	#category : #printing,
 	#'squeak_changestamp' : 'ct 2/1/2026 03:54'
 }
