@@ -25,7 +25,7 @@ MorseYarosRemoteObject >> beCurrentDuring: aBlock [
 ]
 
 {
-	#category : #'as yet unclassified',
+	#category : #printing,
 	#'squeak_changestamp' : 'ct 2/17/2026 00:54'
 }
 MorseYarosRemoteObject >> printOn: aStream [
@@ -35,7 +35,7 @@ MorseYarosRemoteObject >> printOn: aStream [
 ]
 
 {
-	#category : #'as yet unclassified',
+	#category : #printing,
 	#'squeak_changestamp' : 'ct 2/17/2026 00:52'
 }
 MorseYarosRemoteObject >> printString [
