@@ -92,15 +92,17 @@ MorseYarosServer class >> forYaros: aYarosServer [
 
 {
 	#category : #'as yet unclassified',
-	#'squeak_changestamp' : 'ct 2/21/2026 22:46'
+	#'squeak_changestamp' : 'ct 2/22/2026 00:59'
 }
 MorseYarosServer class >> todo [
 
 	self systemNavigation browseAllCallsOn: #yaros and: #flag:.
 	"main issues encountered so far:
 	* yaros does not support weak references (weakly referenced proxies are gc'ed even if the original object on the other side still exists)
-	* class comparison fails
+	* many comparisons/#isKindOf: assume identical classes, not equal (same-named?) classes
+	* #class is inlined so class-side sends to proxies end up on proxy class side
 	* exceptions are not propagated to the other side
+	* non-local returns don't work
 	* tools should open locally (eg #browse)"
 ]
 

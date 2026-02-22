@@ -730,14 +730,14 @@ MethodMorser >> trySyncIncomingChanges: changes [
 
 {
 	#category : #sync,
-	#'squeak_changestamp' : 'ct 2/14/2026 20:02'
+	#'squeak_changestamp' : 'ct 2/22/2026 00:59'
 }
 MethodMorser >> trySyncIncomingChanges: incomingChanges outgoingChanges: outgoingChanges [
 
-	| failedChanges failedIncomingChanges failedRemoteChanges stamp |
+	| failedChanges failedIncomingChanges failedRemoteChanges stamp block |
 	self currentSyncChanges: {incomingChanges. outgoingChanges}.
 	self remoteMorser currentSyncChanges: {incomingChanges. outgoingChanges}.
-	[({incomingChanges ifNotEmpty: [:changes |
+	block := [[({incomingChanges ifNotEmpty: [:changes |
 		[failedIncomingChanges := self trySyncIncomingChanges: changes]].
 	outgoingChanges ifNotEmpty: [:changes |
 		[failedRemoteChanges := self trySyncOutgoingChanges: changes]]}
@@ -745,7 +745,18 @@ MethodMorser >> trySyncIncomingChanges: incomingChanges outgoingChanges: outgoin
 			morseConcurrentCollect: #value]
 				ensure:
 					[self currentSyncChanges: nil.
-					self remoteMorser currentSyncChanges: nil].
+					self remoteMorser currentSyncChanges: nil]].
+	Processor activeProcess == Project current uiProcess
+		ifTrue:
+			[| promise |
+			self flag: #(workaround yaros). "#morseRootProcess does not work across remote message sends"
+			promise := Promise new.
+			[promise fulfillWith: block] fork.
+			[promise isSettled] whileFalse:
+				[Project current world doOneCycle.
+				Processor yield].
+			promise value]
+		ifFalse: [block value].
 	
 	failedChanges := (failedIncomingChanges ifNil: [#()])
 		, (failedRemoteChanges ifNil: [#()]).
