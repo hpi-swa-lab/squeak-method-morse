@@ -2,7 +2,7 @@ Extension { #name : #MethodMorserTool }
 
 {
 	#category : #'*MethodMorseDomains-Code-accessing-override',
-	#'squeak_changestamp' : 'ct 2/17/2026 00:37'
+	#'squeak_changestamp' : 'ct 2/22/2026 23:33'
 }
 MethodMorserTool >> environment: anEnvironment [
 
@@ -12,4 +12,6 @@ MethodMorserTool >> environment: anEnvironment [
 	environment := anEnvironment.
 	
 	self morser addSpace: (MorseCodeSpace forEnvironment: self environment).
+	
+	self changed: #environment.
 ]
