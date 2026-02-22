@@ -86,6 +86,24 @@ MorseServer >> editConnection [
 
 {
 	#category : #testing,
+	#'squeak_changestamp' : 'ct 2/22/2026 23:41'
+}
+MorseServer >> isConnected [
+
+	^ self subclassResponsibility
+]
+
+{
+	#category : #testing,
+	#'squeak_changestamp' : 'ct 2/22/2026 19:26'
+}
+MorseServer >> isConnectionPending [
+
+	^ self isRunning and: [self isConnected not]
+]
+
+{
+	#category : #testing,
 	#'squeak_changestamp' : 'ct 2/1/2026 00:28'
 }
 MorseServer >> isRunning [

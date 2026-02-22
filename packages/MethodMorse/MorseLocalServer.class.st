@@ -50,6 +50,15 @@ MorseLocalServer >> initialize [
 
 {
 	#category : #testing,
+	#'squeak_changestamp' : 'ct 2/23/2026 00:07'
+}
+MorseLocalServer >> isConnected [
+
+	^ self isRunning
+]
+
+{
+	#category : #testing,
 	#'squeak_changestamp' : 'ct 2/1/2026 00:29'
 }
 MorseLocalServer >> isRunning [
@@ -120,13 +129,14 @@ MorseLocalServer >> remoteSpaces: aDictionary [
 
 {
 	#category : #control,
-	#'squeak_changestamp' : 'ct 2/1/2026 01:56'
+	#'squeak_changestamp' : 'ct 2/23/2026 00:13'
 }
 MorseLocalServer >> start [
 
 	self stop.
 	isRunning := true.
 	self triggerEvent: #started.
+	self triggerEvent: #connected.
 ]
 
 {

@@ -212,20 +212,29 @@ MethodMorser >> isAutoSyncOutgoingInProgress [
 
 {
 	#category : #testing,
-	#'squeak_changestamp' : 'ct 2/1/2026 02:32'
+	#'squeak_changestamp' : 'ct 2/22/2026 19:05'
 }
 MethodMorser >> isConnected [
 
-	^ self server ifNil: [false] ifNotNil: [self server isRunning]
+	^ self server ifNil: [false] ifNotNil: [self server isConnected]
 ]
 
 {
 	#category : #testing,
-	#'squeak_changestamp' : 'ct 2/1/2026 02:29'
+	#'squeak_changestamp' : 'ct 2/22/2026 23:44'
+}
+MethodMorser >> isConnectedOrPending [
+
+	^ self isConnected or: [self isConnectionPending]
+]
+
+{
+	#category : #testing,
+	#'squeak_changestamp' : 'ct 2/22/2026 19:25'
 }
 MethodMorser >> isConnectionPending [
 
-	^ self server notNil and: [self isConnected not]
+	^ self server notNil and: [self server isConnectionPending]
 ]
 
 {
@@ -338,20 +347,31 @@ MethodMorser >> newSynchronizationTask [
 
 {
 	#category : #updating,
-	#'squeak_changestamp' : 'ct 2/1/2026 00:31'
+	#'squeak_changestamp' : 'ct 2/22/2026 19:09'
 }
-MethodMorser >> noteServerStarted [
+MethodMorser >> noteServerConnected [
 
 	self remoteMorser: self server remoteMorser.
+	self changed: #isConnected.
 ]
 
 {
 	#category : #updating,
-	#'squeak_changestamp' : 'ct 2/1/2026 00:31'
+	#'squeak_changestamp' : 'ct 2/22/2026 19:08'
+}
+MethodMorser >> noteServerStarted [
+
+	self changed: #isConnectionPending.
+]
+
+{
+	#category : #updating,
+	#'squeak_changestamp' : 'ct 2/22/2026 19:48'
 }
 MethodMorser >> noteServerStopped [
 
 	self remoteMorser: nil.
+	self changed: #isConnected.
 ]
 
 {
@@ -418,15 +438,11 @@ MethodMorser >> remoteMorser [
 
 {
 	#category : #accessing,
-	#'squeak_changestamp' : 'ct 2/17/2026 01:46'
+	#'squeak_changestamp' : 'ct 2/22/2026 23:42'
 }
 MethodMorser >> remoteMorser: aMethodMorser [
 
-	| old |
-	old := self remoteMorser.
 	remoteMorser := aMethodMorser.
-	old ifNotNil:
-		[old removeDependent: self].
 	self remoteMorser ifNotNil:
 		[self remoteMorser addDependent: self].
 ]
@@ -528,7 +544,7 @@ MethodMorser >> server [
 
 {
 	#category : #accessing,
-	#'squeak_changestamp' : 'ct 2/16/2026 21:09'
+	#'squeak_changestamp' : 'ct 2/22/2026 19:30'
 }
 MethodMorser >> server: aMorseServer [
 
@@ -543,6 +559,7 @@ MethodMorser >> server: aMorseServer [
 		ifNil: [^ self];
 		morser: self;
 		when: #started send: #noteServerStarted to: self;
+		when: #connected send: #noteServerConnected to: self;
 		when: #stopped send: #noteServerStopped to: self.
 ]
 
@@ -655,12 +672,45 @@ MethodMorser >> stopAutoSyncOutgoing [
 
 {
 	#category : #control,
-	#'squeak_changestamp' : 'ct 2/2/2026 00:42'
+	#'squeak_changestamp' : 'ct 2/23/2026 00:01'
 }
 MethodMorser >> stopConnection [
 
 	self stopAutoSync.
-	self server ifNotNil: #stop.
+	self isConnectedOrPending ifFalse: [^ self].
+	
+	self stopRemoteConnection.
+	self stopSingleConnection wait.
+]
+
+{
+	#category : #control,
+	#'squeak_changestamp' : 'ct 2/23/2026 00:14'
+}
+MethodMorser >> stopRemoteConnection [
+
+	self remoteMorser ifNotNil: [:remote |
+		remote removeDependent: self.
+		self removeDependent: remote.
+		remote stopSingleConnection.
+		Processor yield.
+		[[self remoteMorser] whileNotNil:
+			[0.5 seconds wait]]
+				valueWithin: 5 seconds onTimeout: []].
+]
+
+{
+	#category : #control,
+	#'squeak_changestamp' : 'ct 2/22/2026 23:45'
+}
+MethodMorser >> stopSingleConnection [
+
+	| promise |
+	promise := Promise new.
+	self server
+		ifNil: [promise resolve]
+		ifNotNil: [:it | [promise fulfillWith: [it stop]] fork].
+	^ promise
 ]
 
 {

@@ -2,7 +2,9 @@ Class {
 	#name : #MorseYarosServer,
 	#superclass : #MorseServer,
 	#instVars : [
-		'yarosServer'
+		'yarosServer',
+		'remoteMorser',
+		'connectionProcess'
 	],
 	#category : #'MethodMorseServers-Yaros'
 }
@@ -107,6 +109,34 @@ MorseYarosServer class >> todo [
 ]
 
 {
+	#category : #private,
+	#'squeak_changestamp' : 'ct 2/22/2026 23:53'
+}
+MorseYarosServer >> connect [
+
+	| newRemoteMorser |
+	[[newRemoteMorser := self getRemoteMorser]
+		on: Error do: [:ex | ex messageText = 'timeout' ifFalse: [ex pass]. ex return: nil]]
+			whileNil.
+	connectionProcess := nil.
+	self connectTo: newRemoteMorser.
+	
+	"optimization to avoid waiting until next timeout"
+	self remoteMorser server connectTo: self morser.
+]
+
+{
+	#category : #private,
+	#'squeak_changestamp' : 'ct 2/22/2026 21:51'
+}
+MorseYarosServer >> connectTo: aRemoteMorser [
+
+	connectionProcess ifNotNil: #terminate.
+	remoteMorser := aRemoteMorser.
+	self triggerEvent: #connected.
+]
+
+{
 	#category : #connection,
 	#'squeak_changestamp' : 'ct 2/16/2026 20:36'
 }
@@ -125,8 +155,17 @@ MorseYarosServer >> connectionType [
 ]
 
 {
+	#category : #private,
+	#'squeak_changestamp' : 'ct 2/22/2026 19:07'
+}
+MorseYarosServer >> getRemoteMorser [
+
+	^ self yarosServer get: #methodMorser
+]
+
+{
 	#category : #'initialize-release',
-	#'squeak_changestamp' : 'ct 2/17/2026 00:27'
+	#'squeak_changestamp' : 'ct 2/22/2026 22:36'
 }
 MorseYarosServer >> initializeWithYarosServer: aYarosServer [
 
@@ -141,7 +180,18 @@ MorseYarosServer >> initializeWithYarosServer: aYarosServer [
 	
 	self yarosServer
 		when: #started send: #noteYarosStarted to: self;
-		when: #stopped send: #noteYarosStopped to: self.
+		when: #stopped send: #noteYarosStopped to: self;
+		when: #disconnected send: #noteYarosDisconnected to: self;
+		when: #aboutToStop send: #removeActionsWithReceiver:forEvent: to: self yarosServer withArguments: {self. #disconnected}.
+]
+
+{
+	#category : #testing,
+	#'squeak_changestamp' : 'ct 2/22/2026 19:07'
+}
+MorseYarosServer >> isConnected [
+
+	^ self remoteMorser notNil
 ]
 
 {
@@ -167,20 +217,35 @@ MorseYarosServer >> morser: aMethodMorser [
 
 {
 	#category : #updating,
-	#'squeak_changestamp' : 'ct 2/16/2026 20:29'
+	#'squeak_changestamp' : 'ct 2/22/2026 22:42'
 }
-MorseYarosServer >> noteYarosStarted [
+MorseYarosServer >> noteYarosDisconnected [
 
-	self triggerEvent: #started.
+	self isConnected ifTrue: [self stop].
+ 
 ]
 
 {
 	#category : #updating,
-	#'squeak_changestamp' : 'ct 2/16/2026 20:29'
+	#'squeak_changestamp' : 'ct 2/22/2026 21:51'
+}
+MorseYarosServer >> noteYarosStarted [
+
+	self triggerEvent: #started.
+	self startConnecting.
+]
+
+{
+	#category : #updating,
+	#'squeak_changestamp' : 'ct 2/22/2026 22:36'
 }
 MorseYarosServer >> noteYarosStopped [
 
+	remoteMorser := nil.
+	self triggerEvent: #disconnected.
 	self triggerEvent: #stopped.
+	
+	self yarosServer when: #disconnected send: #noteYarosDisconnected to: self.
 ]
 
 {
@@ -195,12 +260,11 @@ MorseYarosServer >> release [
 
 {
 	#category : #accessing,
-	#'squeak_changestamp' : 'ct 2/16/2026 20:37'
+	#'squeak_changestamp' : 'ct 2/22/2026 19:23'
 }
 MorseYarosServer >> remoteMorser [
 
-	self isRunning ifFalse: [^ nil].
-	^ self yarosServer get: #methodMorser
+	^ remoteMorser
 ]
 
 {
@@ -214,11 +278,23 @@ MorseYarosServer >> start [
 ]
 
 {
+	#category : #private,
+	#'squeak_changestamp' : 'ct 2/22/2026 21:51'
+}
+MorseYarosServer >> startConnecting [
+
+	connectionProcess := [[self connect]
+		ensure: [connectionProcess := nil]]
+			forkAt: Processor systemBackgroundPriority.
+]
+
+{
 	#category : #control,
-	#'squeak_changestamp' : 'ct 2/16/2026 20:29'
+	#'squeak_changestamp' : 'ct 2/22/2026 21:52'
 }
 MorseYarosServer >> stop [
 
+	connectionProcess ifNotNil: #terminate.
 	self yarosServer stop.
 ]
 

@@ -80,14 +80,17 @@ MethodMorserTool class >> registerInWorldMenu [
 
 {
 	#category : #preferences,
-	#'squeak_changestamp' : 'ct 2/13/2026 19:31'
+	#'squeak_changestamp' : 'ct 2/22/2026 23:52'
 }
 MethodMorserTool class >> themeProperties [
 
 	^ super themeProperties,
-		{ { #ongoingSyncColor. 'Colors' . 'Button color to indicate ongoing sync in Method Morse.' }.
-		{ #incompleteSyncColor. 'Colors' . 'Button color to indicate incomplete sync in Method Morse.' }.
-		{ #recentSyncColor. 'Colors' . 'Button color to indicate recent successful sync in Method Morse.' } }
+		#((connectingColor 'Colors' 'Button color to indicate pending Method Morse connection.')
+		(connectedColor 'Colors' 'Button color to indicate established Method Morse connection.')
+		
+		(ongoingSyncColor 'Colors' 'Button color to indicate ongoing sync in Method Morse.')
+		(incompleteSyncColor 'Colors' 'Button color to indicate incomplete sync in Method Morse.')
+		(recentSyncColor 'Colors' 'Button color to indicate recent successful sync in Method Morse.'))
 ]
 
 {
@@ -440,7 +443,7 @@ MethodMorserTool >> buildAutoSyncPaneWith: builder [
 
 {
 	#category : #toolbuilder,
-	#'squeak_changestamp' : 'ct 1/31/2026 22:33'
+	#'squeak_changestamp' : 'ct 2/22/2026 23:45'
 }
 MethodMorserTool >> buildConnectButtonWith: builder [
 
@@ -448,7 +451,7 @@ MethodMorserTool >> buildConnectButtonWith: builder [
 		model: self;
 		label: #connectLabel;
 		action: #toggleConnection;
-		state: #isConnected;
+		state: #isConnectedOrPending;
 		color: #connectionColor;
 		yourself
 ]
@@ -610,6 +613,24 @@ MethodMorserTool >> connectLabel [
 ]
 
 {
+	#category : #'toolbuilder - constants',
+	#'squeak_changestamp' : 'ct 2/22/2026 23:32'
+}
+MethodMorserTool >> connectedColor [
+
+	^ self userInterfaceTheme connectingColor ifNil: [Color green]
+]
+
+{
+	#category : #'toolbuilder - constants',
+	#'squeak_changestamp' : 'ct 2/22/2026 23:32'
+}
+MethodMorserTool >> connectingColor [
+
+	^ self userInterfaceTheme connectingColor ifNil: [Color yellow]
+]
+
+{
 	#category : #toolbuilder,
 	#'squeak_changestamp' : 'ct 2/1/2026 02:44'
 }
@@ -620,13 +641,14 @@ MethodMorserTool >> connectionBarHeightWith: builder [
 
 {
 	#category : #'accessing - toolbuilder',
-	#'squeak_changestamp' : 'ct 1/31/2026 22:51'
+	#'squeak_changestamp' : 'ct 2/23/2026 00:03'
 }
 MethodMorserTool >> connectionColor [
-	<uses: #isConnected>
+	<uses: #(isConnected isConnectionPending)>
 
 	self isConnected ifFalse: [^ self defaultButtonColor].
-	self halt
+	self isConnectionPending ifTrue: [^ self connectingColor].
+	^ self connectedColor
 ]
 
 {
@@ -641,10 +663,12 @@ MethodMorserTool >> defaultButtonColor [
 
 {
 	#category : #actions,
-	#'squeak_changestamp' : 'ct 2/11/2026 17:26'
+	#'squeak_changestamp' : 'ct 2/22/2026 23:50'
 }
 MethodMorserTool >> doManualSync [
 
+	self isConnected ifFalse: [^ self errorNotConnected].
+	
 	^ self morser doManualSync
 ]
 
@@ -683,6 +707,15 @@ MethodMorserTool >> environment [
 MethodMorserTool >> environment: anEnvironment [
 
 	environment := anEnvironment.
+]
+
+{
+	#category : #private,
+	#'squeak_changestamp' : 'ct 2/22/2026 23:50'
+}
+MethodMorserTool >> errorNotConnected [
+
+	^ self inform: 'Morsers not connected'
 ]
 
 {
@@ -788,6 +821,15 @@ MethodMorserTool >> isAutoSyncOutgoingInProgress [
 MethodMorserTool >> isConnected [
 
 	^ self morser isConnected
+]
+
+{
+	#category : #testing,
+	#'squeak_changestamp' : 'ct 2/23/2026 00:05'
+}
+MethodMorserTool >> isConnectedOrPending [
+
+	^ self morser isConnectedOrPending
 ]
 
 {
@@ -1125,10 +1167,12 @@ MethodMorserTool >> setUpEnvironmentExample [
 
 {
 	#category : #actions,
-	#'squeak_changestamp' : 'ct 2/1/2026 02:31'
+	#'squeak_changestamp' : 'ct 2/22/2026 23:38'
 }
 MethodMorserTool >> startConnection [
 
+	self morserServer ifNil: [^ self inform: 'Please set up a connection first'].
+	
 	self morser startConnection.
 ]
 
@@ -1152,41 +1196,47 @@ MethodMorserTool >> syncPaneHeightWith: builder [
 
 {
 	#category : #actions,
-	#'squeak_changestamp' : 'ct 2/1/2026 03:02'
+	#'squeak_changestamp' : 'ct 2/22/2026 23:50'
 }
 MethodMorserTool >> toggleAutoSync [
 
+	self isConnected ifFalse: [^ self errorNotConnected].
+	
 	self morser autoSyncEnabled: self autoSyncEnabled not.
 	self changed: #autoSyncEnabled.
 ]
 
 {
 	#category : #actions,
-	#'squeak_changestamp' : 'ct 2/1/2026 03:08'
+	#'squeak_changestamp' : 'ct 2/22/2026 23:50'
 }
 MethodMorserTool >> toggleAutoSyncIncoming [
 
+	self isConnected ifFalse: [^ self errorNotConnected].
+	
 	self morser autoSyncIncomingEnabled: self autoSyncIncomingEnabled not.
 	self changed: #autoSyncIncomingEnabled.
 ]
 
 {
 	#category : #actions,
-	#'squeak_changestamp' : 'ct 2/1/2026 03:07'
+	#'squeak_changestamp' : 'ct 2/22/2026 23:50'
 }
 MethodMorserTool >> toggleAutoSyncOutgoing [
 
+	self isConnected ifFalse: [^ self errorNotConnected].
+	
 	self morser autoSyncOutgoingEnabled: self autoSyncOutgoingEnabled not.
 	self changed: #autoSyncOutgoingEnabled.
 ]
 
 {
 	#category : #actions,
-	#'squeak_changestamp' : 'ct 1/31/2026 22:32'
+	#'squeak_changestamp' : 'ct 2/23/2026 00:16'
 }
 MethodMorserTool >> toggleConnection [
 
-	^ self isConnected
+	^ self isConnectedOrPending
 		ifFalse: [self startConnection]
 		ifTrue: [self stopConnection]
 ]
