@@ -50,7 +50,7 @@ MorseSynchronizationTool class >> themeProperties [
 
 {
 	#category : #actions,
-	#'squeak_changestamp' : 'ct 2/11/2026 19:55'
+	#'squeak_changestamp' : 'ct 2/23/2026 00:21'
 }
 MorseSynchronizationTool >> apply [
 
@@ -64,7 +64,9 @@ MorseSynchronizationTool >> apply [
 		[self confirm: 'Some items have been edited but ignored. Continue and discard these edits?'])
 			ifFalse: [^ self].
 	
-	self close.
+	[self close]
+		on: Notification
+		do: [:ex | ex tag = #morseOkToDiscardEdits ifFalse: [ex pass]. ex resume: true].
 	self task applyWith: self morser.
 ]
 
@@ -1317,11 +1319,15 @@ MorseSynchronizationTool >> okToClose [
 
 {
 	#category : #updating,
-	#'squeak_changestamp' : 'ct 2/9/2026 22:20'
+	#'squeak_changestamp' : 'ct 2/23/2026 00:20'
 }
 MorseSynchronizationTool >> okToDiscardEdits [
 
-	^ self hasAnyEdits ==> [self confirm: 'Discard edited versions?']
+	^ self hasAnyEdits ==>
+		[(Notification new
+			tag: #morseOkToDiscardEdits;
+			signal)
+				ifNil: [self confirm: 'Discard edited versions?']]
 ]
 
 {
