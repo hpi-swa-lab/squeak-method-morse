@@ -316,12 +316,12 @@ MorseYarosServer >> yarosServer [
 
 {
 	#category : #connection,
-	#'squeak_changestamp' : 'ct 2/22/2026 23:54'
+	#'squeak_changestamp' : 'ct 2/23/2026 01:40'
 }
 MorseYarosServer >> yarosType [
 
 	^ #(client server)
 		detect: [:subtype |
-			self yarosServer printString includesSubstring: subtype]
+			self yarosServer printString includesSubstring: subtype caseSensitive: false]
 		ifNone: [nil]
 ]
