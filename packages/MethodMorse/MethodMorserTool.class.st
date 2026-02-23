@@ -642,14 +642,14 @@ MethodMorserTool >> connectionBarHeightWith: builder [
 
 {
 	#category : #'accessing - toolbuilder',
-	#'squeak_changestamp' : 'ct 2/23/2026 00:03'
+	#'squeak_changestamp' : 'ct 2/23/2026 01:03'
 }
 MethodMorserTool >> connectionColor [
 	<uses: #(isConnected isConnectionPending)>
 
-	self isConnected ifFalse: [^ self defaultButtonColor].
+	self isConnected ifTrue: [^ self connectedColor].
 	self isConnectionPending ifTrue: [^ self connectingColor].
-	^ self connectedColor
+	^ self defaultButtonColor
 ]
 
 {
