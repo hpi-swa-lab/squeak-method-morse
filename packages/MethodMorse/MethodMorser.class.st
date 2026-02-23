@@ -701,7 +701,7 @@ MethodMorser >> stopRemoteConnection [
 
 {
 	#category : #control,
-	#'squeak_changestamp' : 'ct 2/22/2026 23:45'
+	#'squeak_changestamp' : 'ct 2/23/2026 00:49'
 }
 MethodMorser >> stopSingleConnection [
 
@@ -709,19 +709,22 @@ MethodMorser >> stopSingleConnection [
 	promise := Promise new.
 	self server
 		ifNil: [promise resolve]
-		ifNotNil: [:it | [promise fulfillWith: [it stop]] fork].
+		ifNotNil: [:it | [promise morseFulfillOrRejectIfCurtailedWith: [it stop]] fork].
 	^ promise
 ]
 
 {
 	#category : #sync,
-	#'squeak_changestamp' : 'ct 2/13/2026 23:44'
+	#'squeak_changestamp' : 'ct 2/23/2026 00:56'
 }
 MethodMorser >> tryApplyIncomingChanges: changes forSyncType: type [
 
 	| changeProjects compatibleChanges failedChanges |
 	Processor activeProcess morseRootProcess == Project current uiProcess ifFalse:
-		[^ (self future tryApplyIncomingChanges: changes forSyncType: type) wait].
+		[^ Promise new
+			in: [:p | Project current addDeferredUIMessage:
+				[p morseFulfillOrRejectIfCurtailedWith: [self tryApplyIncomingChanges: changes forSyncType: type]]];
+			morseWaitOrTerminateIfCurtailed].
 	
 	changeProjects := changes
 		collect: [:change |
@@ -780,16 +783,16 @@ MethodMorser >> trySyncIncomingChanges: changes [
 
 {
 	#category : #sync,
-	#'squeak_changestamp' : 'ct 2/22/2026 00:59'
+	#'squeak_changestamp' : 'ct 2/23/2026 00:58'
 }
 MethodMorser >> trySyncIncomingChanges: incomingChanges outgoingChanges: outgoingChanges [
 
 	| failedChanges failedIncomingChanges failedRemoteChanges stamp block |
 	self currentSyncChanges: {incomingChanges. outgoingChanges}.
 	self remoteMorser currentSyncChanges: {incomingChanges. outgoingChanges}.
-	block := [[({incomingChanges ifNotEmpty: [:changes |
+	block := [[({incomingChanges ifEmpty: [nil] ifNotEmpty: [:changes |
 		[failedIncomingChanges := self trySyncIncomingChanges: changes]].
-	outgoingChanges ifNotEmpty: [:changes |
+	outgoingChanges ifEmpty: [nil] ifNotEmpty: [:changes |
 		[failedRemoteChanges := self trySyncOutgoingChanges: changes]]}
 		copyWithout: nil)
 			morseConcurrentCollect: #value]
@@ -798,10 +801,10 @@ MethodMorser >> trySyncIncomingChanges: incomingChanges outgoingChanges: outgoin
 					self remoteMorser currentSyncChanges: nil]].
 	Processor activeProcess == Project current uiProcess
 		ifTrue:
-			[| promise |
+			[| promise process |
 			self flag: #(workaround yaros). "#morseRootProcess does not work across remote message sends"
 			promise := Promise new.
-			[promise fulfillWith: block] fork.
+			process := [promise morseFulfillOrRejectIfCurtailedWith: block] fork.
 			[promise isSettled] whileFalse:
 				[Project current world doOneCycle.
 				Processor yield].
