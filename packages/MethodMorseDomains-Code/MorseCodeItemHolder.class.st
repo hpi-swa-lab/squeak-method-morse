@@ -520,41 +520,48 @@ MorseCodeItemHolder >> mainItemMenu: menu shifted: shifted [
 
 {
 	#category : #'message list menu',
-	#'squeak_changestamp' : 'ct 2/9/2026 19:53'
+	#'squeak_changestamp' : 'ct 2/23/2026 01:25'
 }
 MorseCodeItemHolder >> mainMessageListMenu: aMenu [
 	<messageListMenuShifted: false>
 
-	self flag: #moveUpstream. "!"
-	^ aMenu
-		addTranslatedList: #(
-			('what to show...'			offerWhatToShowMenu));
-		add: (self isBreakOnEntry ifTrue: ['<on>'] ifFalse: ['<off>']) , 'break on entry' translated
-			action: #toggleBreakOnEntry;
-		addTranslatedList: #(
-			-
-			('browse full (b)' 			browseMethodFull)
-			('browse hierarchy (h)'		browseClassHierarchy)
-			('browse protocol (p)'			browseFullProtocol)
-			-
+	self flag: #moveUpstream.
+	aMenu addTranslatedList: #(
+		('what to show...'			offerWhatToShowMenu)).
+	self isShowingMethod ifTrue:
+		[aMenu
+			add: (self isBreakOnEntry ifTrue: ['<on>'] ifFalse: ['<off>']) , 'break on entry' translated
+			action: #toggleBreakOnEntry].
+	aMenu addTranslatedList: #(
+		-
+		('browse full (b)' 			browseMethodFull)
+		('browse hierarchy (h)'		browseClassHierarchy)
+		('browse protocol (p)'			browseFullProtocol)).
+	self isShowingMethod ifTrue:
+		[aMenu addTranslatedList:
+			#(-
 			('fileOut'					fileOutMessage)
 			('printOut'					printOutMessage)
 			('copy selector (c)'			copySelector)
-			('copy reference (C)'		copyReference)
-			-
-			('senders of... (n)'			browseSendersOfMessages)
-			('implementors of... (m)'		browseMessages)
-			('inheritance (i)'			methodHierarchy)
-			('versions (v)'				browseVersions)
-			-
-			('references... (r)'			browseVariableReferences)
-			('assignments... (a)'			browseVariableAssignments)
-			('class refs (N)'			browseClassRefs)
-			-
-			('remove method (x)'			removeMessage)
-			('explore method'			exploreMethod)
-			('inspect method'			inspectMethod));
-		yourself
+			('copy reference (C)'		copyReference))].
+	aMenu addTranslatedList:
+		#(-
+		('senders of... (n)'			browseSendersOfMessages)
+		('implementors of... (m)'		browseMessages)
+		('inheritance (i)'			methodHierarchy)
+		('versions (v)'				browseVersions)
+		-
+		('references... (r)'			browseVariableReferences)
+		('assignments... (a)'			browseVariableAssignments)
+		('class refs (N)'			browseClassRefs)).
+	self isShowingMethod ifTrue:
+		[aMenu
+			addTranslatedList:
+				#(-
+				('remove method (x)'			removeMessage)
+				('explore method'			exploreMethod)
+				('inspect method'			inspectMethod))].
+	^ aMenu
 ]
 
 {
