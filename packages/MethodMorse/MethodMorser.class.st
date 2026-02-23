@@ -295,11 +295,12 @@ MethodMorser >> lastSyncStamp [
 
 {
 	#category : #accessing,
-	#'squeak_changestamp' : 'ct 2/11/2026 19:13'
+	#'squeak_changestamp' : 'ct 2/23/2026 02:22'
 }
 MethodMorser >> lastSyncStamp: aDateAndTime [
 
-	lastSyncStamps at: #sync put: aDateAndTime.
+	self flag: #yaros. "do not store proxies here"
+	lastSyncStamps at: #sync put: (DateAndTime readCarefullyFrom: aDateAndTime asDateAndTime storeString) asTimeStamp "resolve proxy". self flag: #workaround. "TimeStamps don't preserve offsets..."
 	self changed: #lastSyncStamp.
 ]
 
